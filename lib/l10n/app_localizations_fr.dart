@@ -9,7 +9,7 @@ class AppLocalizationsFr extends AppLocalizations {
   AppLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
-  String get appTitle => 'Spharmacy MA';
+  String get appTitle => 'PharmaMa';
 
   @override
   String get searchHint => 'Rechercher un médicament...';

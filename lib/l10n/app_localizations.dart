@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In ar, this message translates to:
-  /// **'صيدلية MA'**
+  /// **'فارماما'**
   String get appTitle;
 
   /// No description provided for @searchHint.

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../database/database_helper.dart';
+import '../database/medication_repository.dart';
 import '../models/medication.dart';
 import '../utils/app_colors.dart';
 import '../widgets/medication_card.dart';
@@ -14,7 +14,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final DatabaseHelper _dbHelper = DatabaseHelper();
+  final MedicationRepository _repository = MedicationRepository();
   final TextEditingController _searchController = TextEditingController();
 
   List<Medication> _medications = [];
@@ -24,6 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _selectedCategory;
   bool _isLoading = true;
   bool _isArabic = true;
+  bool _hasError = false;
+  String _errorMessage = '';
 
   @override
   void initState() {
@@ -38,17 +40,27 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadData() async {
-    final medications = await _dbHelper.getAllMedications();
-    final categories = await _dbHelper.getCategories();
-    final categoriesFr = await _dbHelper.getCategoriesFr();
+    try {
+      await _repository.initialize();
+      final medications = await _repository.getAllMedications();
+      final categories = await _repository.getCategories();
+      final categoriesFr = await _repository.getCategoriesFr();
 
-    setState(() {
-      _medications = medications;
-      _filteredMedications = medications;
-      _categories = categories;
-      _categoriesFr = categoriesFr;
-      _isLoading = false;
-    });
+      setState(() {
+        _medications = medications;
+        _filteredMedications = medications;
+        _categories = categories;
+        _categoriesFr = categoriesFr;
+        _isLoading = false;
+        _hasError = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _hasError = true;
+        _errorMessage = e.toString();
+      });
+    }
   }
 
   void _filterMedications(String query) {
@@ -129,7 +141,48 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: AppColors.emeraldGreen,
                 ),
               )
-            : Column(
+            : _hasError
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.error_outline,
+                            size: 64, color: AppColors.prescriptionBadge),
+                        const SizedBox(height: 16),
+                        Text(
+                          _isArabic
+                              ? 'وقع مشكل فتحميل الأدوية'
+                              : 'Erreur de chargement des médicaments',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _errorMessage,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            setState(() {
+                              _isLoading = true;
+                              _hasError = false;
+                            });
+                            _loadData();
+                          },
+                          icon: const Icon(Icons.refresh),
+                          label: Text(_isArabic ? 'عاود المحاولة' : 'Réessayer'),
+                        ),
+                      ],
+                    ),
+                  )
+                : Column(
                 children: [
                   _buildSearchBar(),
                   _buildCategoryFilter(),
