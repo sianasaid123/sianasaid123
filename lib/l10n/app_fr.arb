@@ -1,0 +1,16 @@
+{
+  "@@locale": "fr",
+  "appTitle": "Spharmacy MA",
+  "searchHint": "Rechercher un médicament...",
+  "medications": "Médicaments",
+  "categories": "Catégories",
+  "indications": "Indications",
+  "howToUse": "Comment l'utiliser",
+  "dosage": "Dosage",
+  "price": "Prix",
+  "prescriptionRequired": "Ordonnance requise",
+  "noResults": "Aucun médicament trouvé",
+  "disclaimer": "Informations à titre éducatif uniquement",
+  "language": "عربي",
+  "currency": "DH"
+}
