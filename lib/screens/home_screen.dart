@@ -98,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const Icon(Icons.local_pharmacy, size: 24),
               const SizedBox(width: 8),
               Text(
-                _isArabic ? 'صيدلية MA' : 'Spharmacy MA',
+                _isArabic ? 'فارماما' : 'PharmaMa',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
@@ -263,9 +263,23 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.only(top: 8, bottom: 16),
-      itemCount: _filteredMedications.length,
+      padding: const EdgeInsets.only(top: 8, bottom: 48),
+      itemCount: _filteredMedications.length + 1,
       itemBuilder: (context, index) {
+        if (index == _filteredMedications.length) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Center(
+              child: Text(
+                '© Jellouli Said 2026',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ),
+          );
+        }
         return MedicationCard(
           medication: _filteredMedications[index],
           isArabic: _isArabic,

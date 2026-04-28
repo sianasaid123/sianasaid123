@@ -1,4 +1,4 @@
-# 🏥 Spharmacy MA - دليل الأدوية المغربي
+# 🏥 PharmaMa - دليل الأدوية المغربي 🇲🇦
 
 <div align="center">
 
@@ -117,3 +117,11 @@ See [`docs/DATA_IMPORT_GUIDE.md`](docs/DATA_IMPORT_GUIDE.md) for instructions on
 ## 📄 License
 
 This project is open source and available under the [MIT License](LICENSE).
+
+---
+
+<div align="center">
+
+**© Jellouli Said 2026** — Made with ❤️ in Morocco 🇲🇦
+
+</div>

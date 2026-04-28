@@ -107,6 +107,8 @@ class DetailScreen extends StatelessWidget {
               ],
               _buildDivider(),
               _buildDisclaimerSection(),
+              const SizedBox(height: 16),
+              _buildCopyright(),
               const SizedBox(height: 24),
             ],
           ),
@@ -418,6 +420,21 @@ class DetailScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCopyright() {
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Center(
+        child: Text(
+          '© Jellouli Said 2026',
+          style: TextStyle(
+            fontSize: 12,
+            color: AppColors.textSecondary,
+          ),
+        ),
       ),
     );
   }

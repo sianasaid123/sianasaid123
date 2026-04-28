@@ -21,7 +21,7 @@ class SpharmacyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Spharmacy MA',
+      title: 'PharmaMa',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       home: const SplashScreen(),
@@ -91,20 +91,48 @@ class _SplashScreenState extends State<SplashScreen>
                     color: AppColors.white.withAlpha(51),
                     borderRadius: BorderRadius.circular(24),
                   ),
-                  child: const Icon(
-                    Icons.local_pharmacy,
-                    size: 72,
-                    color: AppColors.white,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.local_pharmacy,
+                        size: 56,
+                        color: AppColors.white,
+                      ),
+                      const SizedBox(height: 4),
+                      Container(
+                        width: 40,
+                        height: 3,
+                        decoration: BoxDecoration(
+                          color: AppColors.white.withAlpha(178),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      const Icon(
+                        Icons.add,
+                        size: 20,
+                        color: AppColors.white,
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 24),
                 const Text(
-                  'Spharmacy MA',
+                  'PharmaMa',
                   style: TextStyle(
-                    fontSize: 32,
+                    fontSize: 36,
                     fontWeight: FontWeight.bold,
                     color: AppColors.white,
-                    letterSpacing: 1.5,
+                    letterSpacing: 2.0,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '🇲🇦',
+                  style: TextStyle(
+                    fontSize: 24,
+                    color: AppColors.white.withAlpha(230),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -123,7 +151,16 @@ class _SplashScreenState extends State<SplashScreen>
                     color: AppColors.white.withAlpha(178),
                   ),
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 32),
+                Text(
+                  '© Jellouli Said 2026',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.white.withAlpha(153),
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 24),
                 SizedBox(
                   width: 32,
                   height: 32,
