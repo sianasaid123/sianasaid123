@@ -253,17 +253,14 @@ class _HomeScreenState extends State<HomeScreen> {
         itemCount: categories.length,
         itemBuilder: (context, index) {
           final category = categories[index];
-          final arCategory = _categories[index];
-          final frCategory = _categoriesFr[index];
-          final isSelected =
-              _selectedCategory == arCategory || _selectedCategory == frCategory;
+          final isSelected = _selectedCategory == category;
 
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: CategoryChipWidget(
               label: category,
               isSelected: isSelected,
-              onTap: () => _selectCategory(arCategory),
+              onTap: () => _selectCategory(category),
             ),
           );
         },
