@@ -35,33 +35,8 @@ class DetailScreen extends StatelessWidget {
     }
   }
 
-  Color _getCategoryColor(String category) {
-    switch (category) {
-      case 'مسكنات الألم':
-        return const Color(0xFF2196F3);
-      case 'مضادات حيوية':
-        return const Color(0xFFF44336);
-      case 'مضادات الالتهاب':
-        return const Color(0xFFFF9800);
-      case 'أمراض المعدة':
-        return const Color(0xFF9C27B0);
-      case 'أمراض التنفس':
-        return const Color(0xFF00BCD4);
-      case 'فيتامينات':
-        return const Color(0xFFFF9800);
-      case 'أمراض الجلد':
-        return const Color(0xFFE91E63);
-      case 'طفيليات':
-        return const Color(0xFF795548);
-      default:
-        return AppColors.emeraldGreen;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final categoryColor = _getCategoryColor(medication.category);
-
     return Directionality(
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
@@ -79,34 +54,47 @@ class DetailScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildHeader(categoryColor),
+              _buildHeader(),
               _buildPriceSection(),
-              _buildDivider(),
-              _buildSection(
-                icon: Icons.info_outline,
-                title: isArabic ? 'دواعي الاستعمال' : 'Indications',
-                content: isArabic
-                    ? medication.indicationsAr
-                    : medication.indicationsFr,
-                color: AppColors.lightBlue,
-              ),
-              _buildDivider(),
-              _buildSection(
-                icon: Icons.medical_information,
-                title: isArabic ? 'كيفاش تستعملو' : 'Comment l\'utiliser',
-                content: isArabic
-                    ? medication.howToUseAr
-                    : medication.howToUseFr,
-                color: AppColors.emeraldGreen,
-              ),
-              _buildDivider(),
-              _buildDosageSection(),
+              if (medication.isFromOnline) ...[
+                _buildOnlineInfoSection(),
+                _buildDivider(),
+              ],
+              if (medication.indicationsAr.isNotEmpty ||
+                  medication.indicationsFr.isNotEmpty) ...[
+                _buildDivider(),
+                _buildSection(
+                  icon: Icons.info_outline,
+                  title: isArabic ? 'دواعي الاستعمال' : 'Indications',
+                  content: isArabic
+                      ? medication.indicationsAr
+                      : medication.indicationsFr,
+                  color: AppColors.lightBlue,
+                ),
+              ],
+              if (medication.howToUseAr.isNotEmpty ||
+                  medication.howToUseFr.isNotEmpty) ...[
+                _buildDivider(),
+                _buildSection(
+                  icon: Icons.medical_information,
+                  title: isArabic ? 'كيفاش تستعملو' : 'Comment l\'utiliser',
+                  content: isArabic
+                      ? medication.howToUseAr
+                      : medication.howToUseFr,
+                  color: AppColors.emeraldGreen,
+                ),
+              ],
+              if (medication.dosage.isNotEmpty) ...[
+                _buildDivider(),
+                _buildDosageSection(),
+              ],
               if (medication.prescriptionRequired) ...[
                 _buildDivider(),
                 _buildPrescriptionWarning(),
               ],
               _buildDivider(),
               _buildDisclaimerSection(),
+              if (medication.isFromOnline) _buildSourceBadge(),
               const SizedBox(height: 16),
               _buildCopyright(),
               const SizedBox(height: 24),
@@ -117,7 +105,7 @@ class DetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(Color categoryColor) {
+  Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -155,6 +143,17 @@ class DetailScreen extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
           ),
+          if (medication.form != null && medication.form!.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              medication.form!,
+              style: TextStyle(
+                fontSize: 14,
+                color: AppColors.white.withAlpha(200),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -181,7 +180,8 @@ class DetailScreen extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.warning_amber, size: 16, color: AppColors.white),
+                  const Icon(Icons.warning_amber,
+                      size: 16, color: AppColors.white),
                   const SizedBox(width: 4),
                   Text(
                     isArabic ? 'خاصو بوردونونص' : 'Ordonnance requise',
@@ -209,32 +209,152 @@ class DetailScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.emeraldGreen.withAlpha(51)),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Column(
         children: [
-          Icon(Icons.sell, color: AppColors.priceTag, size: 22),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.sell, color: AppColors.priceTag, size: 22),
+              const SizedBox(width: 8),
+              Text(
+                isArabic ? 'الثمن: ' : 'Prix: ',
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              Text(
+                isArabic ? medication.priceDirham : medication.priceFormatted,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.priceTag,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                isArabic ? '(PPV)' : '(PPV - Prix Public de Vente)',
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+          if (medication.priceHospital != null ||
+              medication.pricePara != null) ...[
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (medication.priceHospital != null) ...[
+                  Text(
+                    'PH: ${medication.priceHospital!.toStringAsFixed(2)} DH',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  if (medication.pricePara != null)
+                    const SizedBox(width: 16),
+                ],
+                if (medication.pricePara != null)
+                  Text(
+                    'PPC: ${medication.pricePara!.toStringAsFixed(2)} DH',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOnlineInfoSection() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.lightBlue.withAlpha(12),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.lightBlue.withAlpha(40)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.info_outline, size: 18, color: AppColors.lightBlue),
+              const SizedBox(width: 8),
+              Text(
+                isArabic
+                    ? 'معلومات من medicament.ma'
+                    : 'Informations de medicament.ma',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.lightBlue,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          if (medication.packaging != null &&
+              medication.packaging!.isNotEmpty)
+            _buildInfoRow(
+              icon: Icons.inventory_2_outlined,
+              label: isArabic ? 'التعبئة' : 'Conditionnement',
+              value: medication.packaging!,
+            ),
+          if (medication.manufacturer != null &&
+              medication.manufacturer!.isNotEmpty)
+            _buildInfoRow(
+              icon: Icons.business,
+              label: isArabic ? 'المختبر' : 'Laboratoire',
+              value: medication.manufacturer!,
+            ),
+          if (medication.form != null && medication.form!.isNotEmpty)
+            _buildInfoRow(
+              icon: Icons.science_outlined,
+              label: isArabic ? 'الشكل' : 'Forme',
+              value: medication.form!,
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 16, color: AppColors.textSecondary),
           const SizedBox(width: 8),
           Text(
-            isArabic ? 'الثمن: ' : 'Prix: ',
+            '$label: ',
             style: const TextStyle(
-              fontSize: 16,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
               color: AppColors.textSecondary,
             ),
           ),
-          Text(
-            isArabic ? medication.priceDirham : medication.priceFormatted,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: AppColors.priceTag,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            isArabic ? '(PPM)' : '(PPM - Prix Public Maroc)',
-            style: const TextStyle(
-              fontSize: 11,
-              color: AppColors.textSecondary,
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppColors.textPrimary,
+              ),
             ),
           ),
         ],
@@ -316,7 +436,8 @@ class DetailScreen extends StatelessWidget {
                   color: const Color(0xFF9C27B0).withAlpha(25),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.science, color: Color(0xFF9C27B0), size: 20),
+                child: const Icon(Icons.science,
+                    color: Color(0xFF9C27B0), size: 20),
               ),
               const SizedBox(width: 10),
               Text(
@@ -417,6 +538,33 @@ class DetailScreen extends StatelessWidget {
                 color: AppColors.textSecondary,
                 height: 1.5,
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSourceBadge() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.lightBlue.withAlpha(12),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.cloud_outlined, size: 14, color: AppColors.lightBlue),
+          const SizedBox(width: 6),
+          Text(
+            isArabic
+                ? 'المصدر: medicament.ma'
+                : 'Source: medicament.ma',
+            style: TextStyle(
+              fontSize: 11,
+              color: AppColors.lightBlue,
             ),
           ),
         ],

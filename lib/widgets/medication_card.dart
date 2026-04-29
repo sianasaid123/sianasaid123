@@ -124,17 +124,44 @@ class MedicationCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      isArabic ? medication.category : medication.categoryFr,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: categoryColor,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            isArabic
+                                ? medication.category
+                                : medication.categoryFr,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: categoryColor,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        if (medication.isFromOnline)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 5,
+                              vertical: 1,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.lightBlue.withAlpha(20),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text(
+                              'medicament.ma',
+                              style: TextStyle(
+                                fontSize: 8,
+                                color: AppColors.lightBlue,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      isArabic ? medication.indicationsAr : medication.indicationsFr,
+                      _getSubtitleText(),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -169,5 +196,20 @@ class MedicationCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _getSubtitleText() {
+    if (medication.isFromOnline) {
+      final parts = <String>[];
+      if (medication.form != null && medication.form!.isNotEmpty) {
+        parts.add(medication.form!);
+      }
+      if (medication.manufacturer != null &&
+          medication.manufacturer!.isNotEmpty) {
+        parts.add(medication.manufacturer!);
+      }
+      return parts.isNotEmpty ? parts.join(' - ') : medication.categoryFr;
+    }
+    return isArabic ? medication.indicationsAr : medication.indicationsFr;
   }
 }

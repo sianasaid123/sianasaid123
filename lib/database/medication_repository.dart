@@ -37,11 +37,38 @@ class MedicationRepository {
       return _memoryMedications ?? SeedData.getMedications();
     }
     try {
-      return await DatabaseHelper().getAllMedications();
+      return await DatabaseHelper().getAllCombinedMedications();
     } catch (e) {
       _useFallback = true;
       _memoryMedications = SeedData.getMedications();
       return _memoryMedications!;
+    }
+  }
+
+  Future<List<Medication>> getSeedMedications() async {
+    if (_useFallback) {
+      return (_memoryMedications ?? SeedData.getMedications())
+          .where((m) => m.source == 'seed')
+          .toList();
+    }
+    return await DatabaseHelper().getAllMedications();
+  }
+
+  Future<List<Medication>> getOnlineMedications() async {
+    if (_useFallback) return [];
+    try {
+      return await DatabaseHelper().getOnlineMedications();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<int> getOnlineCount() async {
+    if (_useFallback) return 0;
+    try {
+      return await DatabaseHelper().getOnlineMedicationCount();
+    } catch (_) {
+      return 0;
     }
   }
 
@@ -53,7 +80,8 @@ class MedicationRepository {
       return med.name.toLowerCase().contains(q) ||
           med.nameFr.toLowerCase().contains(q) ||
           med.category.contains(query) ||
-          med.categoryFr.toLowerCase().contains(q);
+          med.categoryFr.toLowerCase().contains(q) ||
+          (med.manufacturer?.toLowerCase().contains(q) ?? false);
     }).toList();
   }
 
