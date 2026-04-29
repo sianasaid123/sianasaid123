@@ -1,0 +1,16 @@
+{
+  "@@locale": "ar",
+  "appTitle": "فارماما",
+  "searchHint": "قلّب على دوا...",
+  "medications": "الأدوية",
+  "categories": "التصنيفات",
+  "indications": "دواعي الاستعمال",
+  "howToUse": "كيفاش تستعملو",
+  "dosage": "الجرعة",
+  "price": "الثمن",
+  "prescriptionRequired": "خاصو بوردونونص",
+  "noResults": "ما لقينا حتى دوا",
+  "disclaimer": "هاد المعلومات غير للتثقيف الصحي",
+  "language": "FR",
+  "currency": "درهم"
+}
